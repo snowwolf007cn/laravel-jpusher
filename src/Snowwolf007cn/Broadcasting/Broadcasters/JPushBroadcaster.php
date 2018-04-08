@@ -4,7 +4,11 @@ namespace Snowwolf007cn\Broadcasting\Broadcasters;
 
 use Illuminate\Broadcasting\Broadcasters\Broadcaster;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
 use JPush\Client;
+use JPush\Exceptions\APIConnectionException;
+use JPush\Exceptions\APIRequestException;
+use JPush\Exceptions\ServiceNotAvaliable;
 use JPush\PushPayload;
 
 /**
@@ -46,16 +50,38 @@ class JPushBroadcaster extends Broadcaster
      */
     public function broadcast(array $channels, $event, array $payload = [])
     {
-        $cid = Arr::get($payload, 'cid');
-        $platform = Arr::get($payload, 'platform', 'all');
-        $audience = Arr::get($payload, 'audience', 'all');
-        $push = $this->client->push();
-        $push->setPlatform($platform);
-        $push = $this->processAudience($audience, $push);
-        if (null !== $cid) {
-            $push->setCid($cid);
+        try {
+            $push = $this->client->push();
+
+            $cid = Arr::get($payload, 'cid', $push->getCid());
+            $platform = Arr::get($payload, 'platform', 'all');
+            $audience = Arr::get($payload, 'audience', 'all');
+            $notification = Arr::get($payload, 'notification');
+            $message = Arr::get($payload, 'message');
+            $options = Arr::get($payload, 'options');
+            $push->setPlatform($platform);
+            $push = $this->processAudience($audience, $push);
+            if (!empty($notification)) {
+                $push = $this->processNotification($notification, $push);
+            }
+            if (!empty($message)) {
+                $messageContent = Arr::get($message, 'message_content');
+                if (is_string($messageContent)) {
+                    $push->message($message);
+                }
+            }
+            if (!$options) {
+                $push->options($options);
+            }
+            if (null !== $cid) {
+                $push->setCid($cid);
+            }
+
+            return $push->send();
+        } catch (APIConnectionException | APIRequestException | ServiceNotAvaliable $e) {
+            Log::error($e->getMessage());
+            throw $e;
         }
-        $push->send();
     }
 
     /**
@@ -114,8 +140,8 @@ class JPushBroadcaster extends Broadcaster
         }
         $androidNotification = Arr::get($payload, 'android');
         if (!empty($androidNotification)) {
-            $iosAlert = Arr::get($androidNotification, 'alert', '');
-            $push->iosNotification($iosAlert, $androidNotification);
+            $androidAlert = Arr::get($androidNotification, 'alert', '');
+            $push->androidNotification($androidAlert, $androidNotification);
         }
 
         return $push;

@@ -1,29 +1,33 @@
 {
-    "name": "snowwolf007cn/laravel-jpusher",
-    "description": "JPush integration to laravel framework",
-    "type": "library",
-    "require": {
-        "laravel/framework": "^5.5",
-        "jpush/jpush": "^3.5"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "^7.0"
-    },
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Zhang Zhi",
-            "email": "snowwolf007cn@gmail.com"
-        }
-    ],
-    "autoload":{
-      "psr-4":{
-        "Snowwolf007cn\\":"src/Snowwolf007cn"
-      }
-    },
-    "extra":{
-      "laravel":{
-        "providers":[]
-      }
+  "name": "snowwolf007cn/laravel-jpusher",
+  "description": "JPush integration to laravel framework",
+  "type": "library",
+  "require": {
+    "laravel/framework": "^5.5",
+    "jpush/jpush": "^3.5"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^7.0"
+  },
+  "license": "MIT",
+  "authors": [{
+    "name": "Zhang Zhi",
+    "email": "snowwolf007cn@gmail.com"
+  }],
+  "autoload": {
+    "psr-4": {
+      "Snowwolf007cn\\": "src/Snowwolf007cn",
+      "Test\\": "tests"
     }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Snowwolf007cn\\Broadcasting\\JPushServiceProvider"
+      ]
+    }
+  },
+  "scripts": {
+    "test": "phpunit"
+  }
 }
