@@ -59,9 +59,7 @@ class JPushBroadcaster extends Broadcaster
 
             $audience = [];
             $formatChannels = $this->formatChannels($channels);
-            Log::info($formatChannels);
             if (in_array('all', $formatChannels, true)) {
-                Log::info($audience);
                 $audience = 'all';
             } else {
                 foreach ($formatChannels as $channel) {
@@ -88,17 +86,15 @@ class JPushBroadcaster extends Broadcaster
             }
 
             $options = Arr::get($payload, 'options');
-            Log::info($options);
             if (null !== $options) {
                 $push->options($options);
             }
             if (null !== $cid) {
-                Log::info($cid);
                 $push->setCid($cid);
             }
 
             $push->send();
-        } catch (APIConnectionException | APIRequestException | ServiceNotAvaliable $e) {
+        } catch (APIRequestException $e) {
             Log::error($e->getMessage());
             throw $e;
         } catch (APIConnectionException | ServiceNotAvaliable $e) {
