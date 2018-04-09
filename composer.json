@@ -16,8 +16,7 @@
   }],
   "autoload": {
     "psr-4": {
-      "Snowwolf007cn\\": "src/Snowwolf007cn",
-      "Test\\": "tests"
+      "Snowwolf007cn\\": "src/Snowwolf007cn"
     }
   },
   "extra": {
