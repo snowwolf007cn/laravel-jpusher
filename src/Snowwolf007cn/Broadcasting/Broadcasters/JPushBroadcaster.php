@@ -53,32 +53,55 @@ class JPushBroadcaster extends Broadcaster
         try {
             $push = $this->client->push();
 
-            $cid = Arr::get($payload, 'cid', $push->getCid());
+            $cid = Arr::get($payload, 'cid', Arr::get(($push->getCid()), 'body.cdlist.0'));
             $platform = Arr::get($payload, 'platform', 'all');
-            $audience = Arr::get($payload, 'audience', 'all');
-            $notification = Arr::get($payload, 'notification');
-            $message = Arr::get($payload, 'message');
-            $options = Arr::get($payload, 'options');
             $push->setPlatform($platform);
+
+            $audience = [];
+            $formatChannels = $this->formatChannels($channels);
+            Log::info($formatChannels);
+            if (in_array('all', $formatChannels, true)) {
+                Log::info($audience);
+                $audience = 'all';
+            } else {
+                foreach ($formatChannels as $channel) {
+                    list($type, $value) = explode('.', $channel);
+                    if (!array_has($type, $audience)) {
+                        $audience[$type] = [];
+                    }
+                    $audience[$type][] = $value;
+                }
+            }
             $push = $this->processAudience($audience, $push);
+
+            $notification = Arr::get($payload, 'notification');
             if (!empty($notification)) {
                 $push = $this->processNotification($notification, $push);
             }
+
+            $message = Arr::get($payload, 'message');
             if (!empty($message)) {
-                $messageContent = Arr::get($message, 'message_content');
+                $messageContent = Arr::pull($message, 'msg_content');
                 if (is_string($messageContent)) {
-                    $push->message($message);
+                    $push->message($messageContent, $message);
                 }
             }
-            if (!$options) {
+
+            $options = Arr::get($payload, 'options');
+            Log::info($options);
+            if (null !== $options) {
                 $push->options($options);
             }
             if (null !== $cid) {
+                Log::info($cid);
                 $push->setCid($cid);
             }
 
-            return $push->send();
+            $push->send();
         } catch (APIConnectionException | APIRequestException | ServiceNotAvaliable $e) {
+            Log::error($e->getMessage());
+            throw $e;
+        } catch (APIConnectionException | ServiceNotAvaliable $e) {
             Log::error($e->getMessage());
             throw $e;
         }
