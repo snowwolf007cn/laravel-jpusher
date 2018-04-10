@@ -13,7 +13,7 @@ JPush integration to laravel framework
     -   <a href="#composer">Composer</a>
     -   <a href="#laravel">Laravel</a>
 -   <a href="#usage">braodcaster</a>
-    - <a href="#config-jpush-broadcaster">Config JPush Broadcasterl</a>
+    - <a href="#config-jpush-broadcaster">Config JPush Broadcaster</a>
     - <a href="#set-audience">Set Audience</a>
     - <a href="#add-payload">Add Payload</a>
 
