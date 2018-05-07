@@ -56,7 +56,7 @@ class JPushBroadcaster extends Broadcaster
             try {
                 $cid = Arr::get($payload, 'cid', Arr::get(($push->getCid()), 'body.cdlist.0'));
             } catch (\Exception $e) {
-                $e;
+                $cid = null;
             }
             $platform = Arr::get($payload, 'platform', 'all');
             $push->setPlatform($platform);
